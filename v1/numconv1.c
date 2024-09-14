@@ -67,6 +67,20 @@ void int_to_base_x(int num, char *dest, int base)
         rest = -rest;
     }
 
+     // calc amount of digits for binary
+    int num_digits = 0;
+    int tmp = rest;
+    do {
+        num_digits++;
+        tmp /= base;
+    } while (tmp > 0);
+
+    // calc amount of leading 0's needed for binary
+    int leading_zeros = 0;
+    if (base == 2) {
+        leading_zeros = (4 - (num_digits % 4)) % 4;
+    }
+
     do {
         if(pos != 0 && (((base == 2 || base == 16) && pos % 5 == 4) || (base == 8 && pos % 4 == 3))) {
             dest[pos++] = ' ';
@@ -85,6 +99,15 @@ void int_to_base_x(int num, char *dest, int base)
     if(negative) {
         dest[pos++] = '-';
     }
+
+    // leading 0's for binary, leading_zeros is 0 for other bases
+    for (int i = 0; i < leading_zeros; i++) {
+        dest[pos++] = '0';
+        if ((pos % 5) == 4) {
+            dest[pos++] = ' ';
+        }
+    }
+
     dest[pos] = '\0';
     not_strreverse(dest);
 }
