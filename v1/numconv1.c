@@ -1,8 +1,5 @@
 #include "../lib/string/not_string.h"
 #include<stdio.h>
-// For alle konverteringsfunktioner gælder at de modtager en streng der enten benyttes som input eller output.
-// De arbejder kun med heltal, og kun med integers. 
-// Integers er som udgangspunkt signed, men kun decimal (titalssystemet) viser negative tal, de øvrige viser to’s komplement udgaven af tallet.
 
 int base_x_to_int(int base, char *str)
 {
