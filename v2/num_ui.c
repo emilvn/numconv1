@@ -1,5 +1,5 @@
 #include<stdio.h>
-#include "numconv1.h"
+#include "numconv2.h"
 #include "num_ui.h"
 
 int main()

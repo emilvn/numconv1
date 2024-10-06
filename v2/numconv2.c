@@ -12,16 +12,20 @@ int base_x_to_int(int base, char *str)
     }
 
     for (int i = negative; i < length; i++) {
-        val *= base;
-        if(base <= 10){
-            val += str[i] - '0';
-        } else if(base <= 16) {
-            if(str[i] >= '0' && str[i] <= '9'){
+        if (base == 2) {
+            val <<= 1; // each step we left shift by 1 bit(* 2) as we go from 1s to 2s to 4s etc.
+            val |= str[i] & 0xF; // mask with F to get the integer value of the char(0 or 1) and add it to val by OR
+        } else if (base == 16) {
+            val <<= 4; // each step we left shift by 4 bits(* 16) as we go from 1s to 16s to 256s etc.
+            if(str[i] >= '0' && str[i] <= '9'){ // if the char is a decimal number
+                val |= str[i] & 0xF; // mask with F to get the integer value of the char(0-9) and add it to val by OR
+            } else {
+                val |= (str[i] & 0xF) + 9; // if the char is a lette we mask as above and add 9 to get the decimal value of the letter(10-15)
+            }
+        } else {
+            val *= base;
+            if(base <= 10){
                 val += str[i] - '0';
-            } else if(str[i] >= 'A' && str[i] <= 'F'){
-                val += str[i] - ('A' - 10);
-            } else if(str[i] >= 'a' && str[i] <= 'f'){
-                val += str[i] - ('a' - 10);
             }
         }
     }
@@ -55,9 +59,9 @@ int oct_to_int(char* str)
 
 void int_to_base_x(int num, char *dest, int base)
 {
-    int rest = num;
     int pos = 0;
     int negative = 0;
+    unsigned int rest = num;
 
     if (num < 0 && base == 10) {
         negative = 1;
@@ -66,7 +70,7 @@ void int_to_base_x(int num, char *dest, int base)
 
      // calc amount of digits for binary
     int num_digits = 0;
-    int tmp = rest;
+    unsigned int tmp = rest;
     do {
         num_digits++;
         tmp /= base;
@@ -79,33 +83,43 @@ void int_to_base_x(int num, char *dest, int base)
     }
 
     do {
-        if(pos != 0 && (((base == 2 || base == 16) && pos % 5 == 4) || (base == 8 && pos % 4 == 3))) {
+        if (pos != 0 && (((base == 2 || base == 16) && pos % 5 == 4) || (base == 8 && pos % 4 == 3))) {
             dest[pos++] = ' ';
-        } else if(base == 10 && pos % 4 == 3){
+        } else if (base == 10 && pos % 4 == 3) {
             dest[pos++] = ',';
         }
-        int d = rest % base;
-        if (d < 10) {
-            dest[pos++] = '0' + d;
+
+        int d;
+        if (base == 2) {
+            d = rest & 1; // mask with 1 to get the last bit
+            rest >>= 1; // right shift the rest to remove the last digit
+        } else if (base == 16) {
+            d = rest & 0xF; // mask with 4 to get the last 4 bits (1 hex digit)
+            rest >>= 4; // right shift the rest to remove the last 4 bits (hex digit)
         } else {
-            dest[pos++] = 'A' + (d - 10);
+            d = rest % base;
+            rest /= base;
         }
-        rest /= base;
+
+        if (d < 10) {
+            dest[pos++] = '0' + d; // convert decimal digits to char
+        } else {
+            dest[pos++] = 'A' + (d - 10); // convert hex digits to char
+        }
 
     } while (rest > 0);
-    if(negative) {
+
+    if (negative) {
         dest[pos++] = '-';
     }
 
     // leading 0's for binary, leading_zeros is 0 for other bases
     for (int i = 0; i < leading_zeros; i++) {
         dest[pos++] = '0';
-        if ((pos % 5) == 4) {
-            dest[pos++] = ' ';
-        }
     }
 
     dest[pos] = '\0';
+
     not_strreverse(dest);
 }
 
