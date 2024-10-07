@@ -20,7 +20,7 @@ int base_x_to_int(int base, char *str)
             if(str[i] >= 0x30 && str[i] <= 0x39){ // if the char is a decimal number
                 val |= str[i] & 0xF; // mask with 0xF to get the integer value of the char(0-9) and add it to val by OR
             } else {
-                val |= (str[i] & 0xF) + 0x9; // if the char is a lette we mask as above and OR with 9 to get the decimal value of the letter(10-15)
+                val |= (str[i] & 0xF) + 0x9; // if the char is a lette we mask as above and add 9 to get the decimal value of the letter(10-15)
             }
         } else {
             val *= base;
